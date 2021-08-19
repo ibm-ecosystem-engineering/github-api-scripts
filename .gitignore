@@ -1,0 +1,6 @@
+__pycache__
+.vscode
+
+setenv.sh
+*.csv
+*.txt
