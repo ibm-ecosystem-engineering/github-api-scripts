@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import argparse
 import requests
 import time
@@ -81,7 +82,7 @@ if __name__=="__main__":
                 'Authorization': 'token ' + args.token
             }
             response = requests.request("GET", url, headers=headers)
-            users.append(response.json()[:])
+            users = users + response.json()
         add_team_members(args.token, args.org, args.team, users, args.role)
     else:
         parser.print_usage()
