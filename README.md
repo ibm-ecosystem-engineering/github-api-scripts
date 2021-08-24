@@ -9,6 +9,11 @@ Usage:
 usage: org.py [-h] -t TOKEN -o ORG [--team TEAM] [-r ROLE] [-f FILE] action
 ```
 
+You will need a GitHub personnal access token with organization admin privileges to perform these actions. To create one:
+- Navigate to https://github.com/settings/tokens/new
+- Select `admin:org`
+- Click `Generate token`
+
 ### Example
 
 To invite a list of users in organization `{ORG_NAME}` :
