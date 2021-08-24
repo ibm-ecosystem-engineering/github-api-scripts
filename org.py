@@ -13,7 +13,7 @@ def invite_users_to_org(token, file, org):
     df = pd.read_csv(file)
     for index, row in df.iterrows():
         print(f'{row["Sr. No"]} - {row["Email"]} ({index})')
-        payload = '{"email": "' + row['Email'] + '", "team_ids": [0]}'
+        payload = '{"email": "' + row['Email'] + '", "team_ids": [1]}'
         headers = {
             'Accept': 'application/vnd.github.v3+json',
             'Content-Type': 'application/json',
