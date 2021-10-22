@@ -19,7 +19,7 @@ You will need a GitHub personnal access token with organization admin privileges
 To invite a list of users in organization `{ORG_NAME}` :
 
 ```sh
-python org.py add_team_members -t {GITHUB_TOKEN} -f {CSV_FILE_NAME} -o {ORG_NAME}
+python org.py invite -t {GITHUB_TOKEN} -f {CSV_FILE_NAME} -o {ORG_NAME}
 ```
 
 **NOTE**: The CSV file must contain `Email` and `Sr. No` columns, like:
