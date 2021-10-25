@@ -6,7 +6,7 @@ Set of Python scripts to help streamline your interactions with GitHub APIs.
 
 Usage:
 ```sh
-usage: org.py [-h] -t TOKEN -o ORG [--team TEAM] [-r ROLE] [-f FILE] action
+usage: org.py [-h] -t TOKEN -o ORG [--team TEAM] [--org-role ROLE] [--team-role ROLE] [-f FILE] action
 ```
 
 You will need a GitHub personnal access token with organization admin privileges to perform these actions. To create one:

@@ -2,24 +2,33 @@ import pandas as pd
 import numpy as np
 import argparse
 import requests
+import json
 import time
 
 
 base_url = "https://api.github.com"
 
 
-def invite_users_to_org(token, file, org):
-    url = f'{base_url}/orgs/{org}/invitations'
+def invite_users_to_org(token, file, org, role):
+    team = None
     df = pd.read_csv(file)
+    # If a team with the same name exists, invite user to this team.
+    headers = {
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': 'token ' + token
+    }
+    response = requests.request("GET", f'{base_url}/orgs/{org}/teams/{org}', headers=headers)
+    if response.status_code != 404:
+        team = json.loads(response.text)
     for index, row in df.iterrows():
         print(f'{row["Sr. No"]} - {row["Email"]} ({index})')
-        payload = '{"email": "' + row['Email'] + '", "team_ids": [1]}'
+        payload = '{"email": "' + row['Email'] + '", "role": "' + role + '", "team_ids": [' + (str(team['id']) if team else '') + ']' + '}'
         headers = {
             'Accept': 'application/vnd.github.v3+json',
             'Content-Type': 'application/json',
             'Authorization': 'token ' + token
         }
-        response = requests.request("POST", url, headers=headers, data=payload)
+        response = requests.request("POST", f'{base_url}/orgs/{org}/invitations', headers=headers, data=payload)
         if response.status_code != 201:
             failed = True
             print(response.text)
@@ -30,7 +39,7 @@ def invite_users_to_org(token, file, org):
                 if response.status_code == 201:
                     failed = False
         success_file = open("successes.txt", "a+")
-        success_file.write(f'{row["Sr. No"]} - {row["Email"]}\n')
+        success_file.write(f'{row["Sr. No"]} - {row["Email"]} - {response.text}\n')
         success_file.close()
         time.sleep(1)
 
@@ -65,15 +74,16 @@ if __name__=="__main__":
     parser.add_argument('-t', '--token', required=True, dest='token', help='authentication token')
     parser.add_argument('-o', '--org', required=True, dest='org', help='GitHub organization')
     parser.add_argument('--team', dest='team', help='GitHub organization team')
-    parser.add_argument('-r', '--role', dest='role', default="member", help='Team role')
+    parser.add_argument('--team-role', dest='team_role', default="member", help='Team role')
+    parser.add_argument('--org-role', dest='org_role', default="direct_member", help='Organization role')
     parser.add_argument('-f', '--file', dest='file', help='CSV file listing users. Needs to include columns "Email" (user email) and "Sr. No" (user int identifier)')
 
     args = parser.parse_args()
 
     # Handle action
     if args.action == "invite":
-        invite_users_to_org(args.token, args.file, args.org)
-    if args.action == "add_team_members":
+        invite_users_to_org(args.token, args.file, args.org, args.org_role)
+    elif args.action == "add_team_members":
         users = []
         for ix in range(3): # Assuming max 300 users per org
             url = f'{base_url}/orgs/{args.org}/members?per_page=100&page={ix+1}'
@@ -83,6 +93,6 @@ if __name__=="__main__":
             }
             response = requests.request("GET", url, headers=headers)
             users = users + response.json()
-        add_team_members(args.token, args.org, args.team, users, args.role)
+        add_team_members(args.token, args.org, args.team, users, args.team_role)
     else:
         parser.print_usage()
