@@ -20,6 +20,7 @@ def invite_users_to_org(token, file, org, role):
     response = requests.request("GET", f'{base_url}/orgs/{org}/teams/{org}', headers=headers)
     if response.status_code != 404:
         team = json.loads(response.text)
+    url = f'{base_url}/orgs/{org}/invitations'
     for index, row in df.iterrows():
         print(f'{row["Sr. No"]} - {row["Email"]} ({index})')
         payload = '{"email": "' + row['Email'] + '", "role": "' + role + '", "team_ids": [' + (str(team['id']) if team else '') + ']' + '}'
@@ -28,7 +29,7 @@ def invite_users_to_org(token, file, org, role):
             'Content-Type': 'application/json',
             'Authorization': 'token ' + token
         }
-        response = requests.request("POST", f'{base_url}/orgs/{org}/invitations', headers=headers, data=payload)
+        response = requests.request("POST", url, headers=headers, data=payload)
         if response.status_code != 201:
             failed = True
             print(response.text)
